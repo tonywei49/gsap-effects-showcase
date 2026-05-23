@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GSAP 动效效果菜单</title>
+  <style>
+    :root {
+      --ink: #171717;
+      --paper: #f4f0e8;
+      --panel: #fffaf0;
+      --line: #171717;
+      --green: #b7ff3c;
+      --blue: #2267ff;
+      --red: #ff4d3d;
+      --amber: #ffb02e;
+      --cyan: #43d9d6;
+      --muted: #6b665c;
+      --shadow: 8px 8px 0 #171717;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow-x: hidden;
+      background:
+        linear-gradient(rgba(23, 23, 23, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(23, 23, 23, 0.045) 1px, transparent 1px),
+        var(--paper);
+      background-size: 28px 28px;
+    }
+
+    button, input { font: inherit; }
+
+    .topbar {
+      position: fixed;
+      z-index: 30;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 10px 18px;
+      border-bottom: 2px solid var(--line);
+      background: rgba(244, 240, 232, 0.9);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      letter-spacing: 0;
+      white-space: nowrap;
+    }
+
+    .brand-mark {
+      width: 22px;
+      height: 22px;
+      background: var(--green);
+      border: 2px solid var(--line);
+      transform: rotate(12deg);
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a, .pill, .replay {
+      color: var(--ink);
+      text-decoration: none;
+      border: 2px solid var(--line);
+      background: var(--panel);
+      padding: 7px 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .nav a.is-active, .replay:hover {
+      background: var(--green);
+    }
+
+    .hero {
+      min-height: 100svh;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+      gap: clamp(22px, 4vw, 58px);
+      align-items: center;
+      padding: 110px clamp(18px, 5vw, 72px) 56px;
+    }
+
+    .hero-copy {
+      max-width: 860px;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 22px;
+      padding: 8px 12px;
+      border: 2px solid var(--line);
+      background: var(--green);
+      border-radius: 8px;
+      font-weight: 900;
+      box-shadow: 4px 4px 0 var(--line);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(48px, 9vw, 132px);
+      line-height: 0.84;
+      letter-spacing: 0;
+      max-width: 900px;
+    }
+
+    .hero p {
+      margin: 26px 0 0;
+      max-width: 650px;
+      font-size: clamp(17px, 2.1vw, 24px);
+      line-height: 1.45;
+      color: #34312c;
+      font-weight: 650;
+      overflow-wrap: anywhere;
+    }
+
+    .hero-board {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      min-height: 520px;
+      border: 3px solid var(--line);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .axis {
+      position: absolute;
+      inset: 28px;
+      border: 2px solid var(--line);
+      background:
+        linear-gradient(90deg, transparent 49%, rgba(23, 23, 23, 0.18) 50%, transparent 51%),
+        linear-gradient(transparent 49%, rgba(23, 23, 23, 0.18) 50%, transparent 51%);
+      background-size: 54px 54px;
+    }
+
+    .orbital {
+      position: absolute;
+      width: 82px;
+      height: 82px;
+      border: 3px solid var(--line);
+      background: var(--blue);
+      left: 44px;
+      top: 66px;
+      border-radius: 50%;
+    }
+
+    .slab {
+      position: absolute;
+      border: 3px solid var(--line);
+      background: var(--amber);
+      box-shadow: 5px 5px 0 var(--line);
+    }
+
+    .slab.one { width: 180px; height: 92px; right: 42px; top: 72px; }
+    .slab.two { width: 240px; height: 118px; left: 70px; bottom: 86px; background: var(--red); }
+    .slab.three { width: 126px; height: 126px; right: 72px; bottom: 64px; background: var(--cyan); transform: rotate(12deg); }
+
+    main {
+      position: relative;
+    }
+
+    section {
+      padding: 72px clamp(18px, 5vw, 72px);
+    }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(32px, 5vw, 64px);
+      line-height: 0.95;
+      letter-spacing: 0;
+    }
+
+    .section-note {
+      max-width: 420px;
+      margin: 0;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      min-height: 260px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 5px 5px 0 var(--line);
+      padding: 16px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: 0;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .stage {
+      position: relative;
+      min-height: 132px;
+      border: 2px dashed rgba(23, 23, 23, 0.35);
+      border-radius: 8px;
+      background: #fffdfa;
+      overflow: hidden;
+    }
+
+    .mini-box {
+      width: 54px;
+      height: 54px;
+      border: 2px solid var(--line);
+      background: var(--green);
+      position: absolute;
+      left: 20px;
+      top: 38px;
+      box-shadow: 4px 4px 0 var(--line);
+    }
+
+    .mini-dot {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--line);
+      border-radius: 50%;
+      background: var(--red);
+      position: absolute;
+      left: 18px;
+      top: 52px;
+    }
+
+    .stagger-row {
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      height: 100%;
+      padding: 20px;
+    }
+
+    .stagger-row span {
+      width: 34px;
+      height: 72px;
+      border: 2px solid var(--line);
+      background: var(--blue);
+      display: block;
+    }
+
+    .text-demo {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      padding: 16px;
+      font-size: 30px;
+      line-height: 1.05;
+      font-weight: 950;
+      text-align: center;
+    }
+
+    .number-demo {
+      display: grid;
+      place-items: center;
+      height: 100%;
+      font-size: 52px;
+      font-weight: 950;
+      color: var(--blue);
+    }
+
+    .path-svg {
+      width: 100%;
+      height: 132px;
+      display: block;
+    }
+
+    .path-svg path {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 3;
+      stroke-dasharray: 8 7;
+    }
+
+    .path-runner {
+      width: 24px;
+      height: 24px;
+      background: var(--red);
+      border: 2px solid var(--line);
+      border-radius: 50%;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .flip-stage {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      padding: 14px;
+      flex-wrap: wrap;
+    }
+
+    .flip-stage.is-list {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .flip-tile {
+      width: 54px;
+      height: 44px;
+      border: 2px solid var(--line);
+      background: var(--amber);
+    }
+
+    .flip-stage.is-list .flip-tile {
+      width: 100%;
+      height: 28px;
+    }
+
+    .drag-target {
+      width: 66px;
+      height: 66px;
+      border: 2px solid var(--line);
+      background: var(--cyan);
+      position: absolute;
+      left: 20px;
+      top: 32px;
+      cursor: grab;
+      box-shadow: 4px 4px 0 var(--line);
+    }
+
+    .scroll-lab {
+      padding-top: 46px;
+    }
+
+    .scroll-stack {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .pin-panel {
+      min-height: 74svh;
+      border: 3px solid var(--line);
+      background: var(--ink);
+      color: var(--paper);
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 4vw, 42px);
+      display: grid;
+      align-content: center;
+      overflow: hidden;
+    }
+
+    .pin-panel strong {
+      font-size: clamp(38px, 6vw, 90px);
+      line-height: 0.9;
+      letter-spacing: 0;
+    }
+
+    .pin-panel span {
+      color: var(--green);
+    }
+
+    .scroll-steps {
+      display: grid;
+      gap: 18px;
+      padding: 8svh 0 40svh;
+    }
+
+    .step {
+      min-height: 42svh;
+      border: 2px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+      box-shadow: 5px 5px 0 var(--line);
+      padding: clamp(18px, 3vw, 34px);
+      display: grid;
+      align-content: center;
+    }
+
+    .step b {
+      display: inline-flex;
+      width: max-content;
+      padding: 7px 10px;
+      border: 2px solid var(--line);
+      background: var(--green);
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .step h3 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 4vw, 46px);
+      line-height: 1;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .horizontal-wrap {
+      min-height: 100svh;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .horizontal-track {
+      display: flex;
+      gap: 18px;
+      width: max-content;
+      padding: 0 8vw;
+    }
+
+    .wide-card {
+      width: min(76vw, 680px);
+      min-height: 58svh;
+      border: 3px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      background: var(--panel);
+      padding: clamp(22px, 4vw, 42px);
+      display: grid;
+      align-content: space-between;
+    }
+
+    .wide-card:nth-child(2) { background: var(--green); }
+    .wide-card:nth-child(3) { background: var(--amber); }
+    .wide-card:nth-child(4) { background: var(--cyan); }
+
+    .wide-card h3 {
+      margin: 0;
+      font-size: clamp(36px, 6vw, 76px);
+      line-height: 0.9;
+    }
+
+    .wide-card p {
+      margin: 24px 0 0;
+      max-width: 440px;
+      font-weight: 800;
+      line-height: 1.45;
+      color: #28251f;
+    }
+
+    .playground {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .console {
+      border: 3px solid var(--line);
+      background: #101010;
+      color: var(--green);
+      min-height: 420px;
+      border-radius: 8px;
+      padding: 22px;
+      box-shadow: var(--shadow);
+      display: grid;
+      align-content: center;
+      overflow: hidden;
+    }
+
+    .console pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: clamp(22px, 4vw, 52px);
+      line-height: 1.05;
+      font-weight: 950;
+    }
+
+    .request-panel {
+      border: 2px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+      box-shadow: 5px 5px 0 var(--line);
+      padding: 18px;
+      display: grid;
+      align-content: start;
+      gap: 12px;
+    }
+
+    .request-panel h3 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .request-panel p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .prompt {
+      border: 2px solid var(--line);
+      background: #fffdfa;
+      border-radius: 8px;
+      padding: 12px;
+      font-weight: 800;
+      line-height: 1.45;
+    }
+
+    .dependency {
+      position: fixed;
+      z-index: 50;
+      left: 18px;
+      bottom: 18px;
+      max-width: min(520px, calc(100vw - 36px));
+      border: 2px solid var(--line);
+      background: var(--red);
+      color: white;
+      padding: 12px 14px;
+      border-radius: 8px;
+      box-shadow: 5px 5px 0 var(--line);
+      font-weight: 800;
+      display: none;
+    }
+
+    .dependency.is-visible { display: block; }
+
+    @media (max-width: 980px) {
+      .hero,
+      .scroll-stack,
+      .playground {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-board {
+        min-height: 360px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 640px) {
+      .topbar {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .nav {
+        justify-content: start;
+      }
+
+      .hero {
+        padding-top: 154px;
+        padding-left: 24px;
+        padding-right: 24px;
+        overflow: hidden;
+      }
+
+      .hero p {
+        max-width: 100%;
+        font-size: 16px;
+      }
+
+      .hero-board {
+        width: min(300px, calc(100vw - 64px));
+        max-width: min(300px, calc(100vw - 64px));
+        min-height: 320px;
+        box-shadow: 5px 5px 0 var(--line);
+      }
+
+      .axis {
+        inset: 28px;
+      }
+
+      .slab.one {
+        width: 96px;
+        height: 52px;
+        right: 34px;
+        top: 74px;
+      }
+
+      .slab.two {
+        width: 120px;
+        height: 62px;
+        left: 74px;
+        bottom: 86px;
+      }
+
+      .slab.three {
+        width: 58px;
+        height: 58px;
+        right: 74px;
+        bottom: 64px;
+      }
+
+      .orbital {
+        width: 42px;
+        height: 42px;
+        left: 56px;
+        top: 80px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-head {
+        align-items: start;
+        flex-direction: column;
+      }
+
+      .horizontal-track {
+        padding: 0 18px;
+      }
+
+      .wide-card {
+        width: calc(100vw - 56px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>GSAP 动效效果菜单</span></div>
+    <nav class="nav" aria-label="页面导航">
+      <a href="#basic">基础动画</a>
+      <a href="#scroll">滚动叙事</a>
+      <a href="#horizontal">横向滚动</a>
+      <a href="#plugins">插件效果</a>
+    </nav>
+  </header>
+
+  <div class="dependency" id="dependency">
+    GSAP 依赖没有加载成功。这个页面使用 CDN 版本的 GSAP；如果离线打开，请先联网，或者把 GSAP 脚本下载成本地文件。
+  </div>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-copy">
+        <div class="kicker">不会描述动效时，就从这里选</div>
+        <h1><span class="hero-word">GSAP</span><br><span class="hero-word">效果</span><br><span class="hero-word">菜单</span></h1>
+        <p class="hero-text">这不是 API 文档，而是给需求描述用的可视化手册：淡入、交错、弹性、路径、滚动固定、横向滚动、文字解码、拖拽和布局切换。</p>
+      </div>
+      <div class="hero-board" aria-label="GSAP hero animation preview">
+        <div class="axis"></div>
+        <div class="orbital"></div>
+        <div class="slab one"></div>
+        <div class="slab two"></div>
+        <div class="slab three"></div>
+      </div>
+    </section>
+
+    <section id="basic">
+      <div class="section-head">
+        <h2>基础动画</h2>
+        <p class="section-note">这些是下指令时最常用的词：淡入、滑入、缩放、旋转、交错、数字滚动和路径运动。</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <h3>淡入 + 上滑</h3>
+          <div class="stage"><div class="mini-box demo-fade"></div></div>
+          <p>说法：从下方滑入并淡入。</p>
+          <button class="replay" data-demo="fade">重播</button>
+        </article>
+
+        <article class="card">
+          <h3>弹性入场</h3>
+          <div class="stage"><div class="mini-box demo-elastic"></div></div>
+          <p>说法：有一点回弹，不要死板。</p>
+          <button class="replay" data-demo="elastic">重播</button>
+        </article>
+
+        <article class="card">
+          <h3>交错出现</h3>
+          <div class="stage">
+            <div class="stagger-row demo-stagger">
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+          <p>说法：多个卡片依次出现。</p>
+          <button class="replay" data-demo="stagger">重播</button>
+        </article>
+
+        <article class="card">
+          <h3>数字滚动</h3>
+          <div class="stage"><div class="number-demo" id="counter">0</div></div>
+          <p>说法：数字从 0 增长到目标值。</p>
+          <button class="replay" data-demo="counter">重播</button>
+        </article>
+
+        <article class="card">
+          <h3>文字揭示</h3>
+          <div class="stage"><div class="text-demo demo-text">文字逐行出现</div></div>
+          <p>说法：标题逐字或逐行出现。</p>
+          <button class="replay" data-demo="text">重播</button>
+        </article>
+
+        <article class="card">
+          <h3>悬浮感</h3>
+          <div class="stage"><div class="mini-box demo-float"></div></div>
+          <p>说法：产品截图轻微上下浮动。</p>
+          <button class="replay" data-demo="float">重播</button>
+        </article>
+
+        <article class="card">
+          <h3>路径运动</h3>
+          <div class="stage">
+            <svg class="path-svg" viewBox="0 0 220 132" aria-hidden="true">
+              <path id="motionPath" d="M15 100 C55 10, 100 10, 118 72 S176 126, 206 32"></path>
+            </svg>
+            <div class="path-runner demo-path"></div>
+          </div>
+          <p>说法：元素沿着一条线移动。</p>
+          <button class="replay" data-demo="path">重播</button>
+        </article>
+
+        <article class="card">
+          <h3>鼠标跟随</h3>
+          <div class="stage" id="mouseStage"><div class="mini-dot demo-mouse"></div></div>
+          <p>说法：光点跟随鼠标，移动要顺滑。</p>
+          <button class="replay" data-demo="mouse">移动鼠标</button>
+        </article>
+      </div>
+    </section>
+
+    <section class="scroll-lab" id="scroll">
+      <div class="section-head">
+        <h2>滚动叙事</h2>
+        <p class="section-note">这一段展示 pin、scrub、分步骤出现和视觉状态切换。向下滚动时，左侧固定，右侧逐条解释。</p>
+      </div>
+      <div class="scroll-stack">
+        <aside class="pin-panel" id="pinPanel">
+          <strong>Scroll<br><span id="scrollState">Trigger</span></strong>
+        </aside>
+        <div class="scroll-steps">
+          <article class="step" data-state="进入视口">
+            <b>01</b>
+            <h3>进入视口才触发</h3>
+            <p>适合“滚到这里再动”的内容，比如功能卡、案例、数据图表。</p>
+          </article>
+          <article class="step" data-state="Pin 固定">
+            <b>02</b>
+            <h3>固定一屏讲故事</h3>
+            <p>适合产品流程、历史线、教程分镜。画面固定，内容逐步变化。</p>
+          </article>
+          <article class="step" data-state="Scrub 绑定">
+            <b>03</b>
+            <h3>动画跟滚动条绑定</h3>
+            <p>滚动多少，动画就走多少。适合进度感很强的交互叙事。</p>
+          </article>
+          <article class="step" data-state="Parallax">
+            <b>04</b>
+            <h3>图文错位视差</h3>
+            <p>背景慢一点，前景快一点，页面会更有深度。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="horizontal" class="horizontal-wrap">
+      <div class="horizontal-track" id="horizontalTrack">
+        <article class="wide-card">
+          <h3>横向滚动</h3>
+          <p>指令说法：用户向下滚动，但内容横向移动。</p>
+        </article>
+        <article class="wide-card">
+          <h3>适合作品集</h3>
+          <p>让多个案例像展览墙一样横向展开，信息密度更高。</p>
+        </article>
+        <article class="wide-card">
+          <h3>也适合流程</h3>
+          <p>采购流程、AI pipeline、视频制作步骤都可以用这种方式。</p>
+        </article>
+        <article class="wide-card">
+          <h3>重点是边界</h3>
+          <p>移动端要检查宽度、触发距离和文字是否被挤压。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="plugins">
+      <div class="section-head">
+        <h2>插件效果</h2>
+        <p class="section-note">这些效果更像“高级动效词”：Flip、Draggable、ScrambleText。用户不用懂代码，只要说想要的状态变化。</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <h3>Flip 布局切换</h3>
+          <div class="stage flip-stage" id="flipStage">
+            <div class="flip-tile"></div><div class="flip-tile"></div><div class="flip-tile"></div><div class="flip-tile"></div>
+          </div>
+          <p>说法：卡片从网格平滑切成列表。</p>
+          <button class="replay" data-demo="flip">切换布局</button>
+        </article>
+
+        <article class="card">
+          <h3>Draggable 拖拽</h3>
+          <div class="stage" id="dragStage"><div class="drag-target" id="dragTarget"></div></div>
+          <p>说法：这个卡片可以拖动，并限制在容器内。</p>
+          <button class="replay" data-demo="drag">拖动方块</button>
+        </article>
+
+        <article class="card">
+          <h3>ScrambleText 解码</h3>
+          <div class="stage"><div class="text-demo" id="scramble">GSAP EFFECTS</div></div>
+          <p>说法：标题像乱码解码一样出现。</p>
+          <button class="replay" data-demo="scramble">重播</button>
+        </article>
+
+        <article class="card">
+          <h3>ScrollTo 平滑跳转</h3>
+          <div class="stage"><div class="text-demo">跳到顶部</div></div>
+          <p>说法：点击按钮平滑滚到指定区域。</p>
+          <button class="replay" data-demo="scrollTop">执行</button>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="playground">
+        <div class="console"><pre id="promptText">用 GSAP 做一个动效网页。
+首屏标题分层入场；
+第二屏 pin 住讲故事；
+卡片 stagger 出现；
+最后 CTA 聚焦收尾。</pre></div>
+        <aside class="request-panel">
+          <h3>不会描述时就这样说</h3>
+          <p>你不需要背 API，只要说清楚“触发时机 + 元素 + 动作 + 状态”。</p>
+          <div class="prompt">触发时机：页面打开 / 滚动到这里 / 鼠标悬停 / 点击后</div>
+          <div class="prompt">元素：标题 / 卡片 / 图片 / SVG / 数字 / 按钮</div>
+          <div class="prompt">动作：淡入 / 滑入 / 缩放 / 固定 / 横向移动 / 解码 / 拖拽</div>
+          <div class="prompt">状态：依次出现 / 跟随滚动 / 有回弹 / 最后停在完整位置</div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MotionPathPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrambleTextPlugin.min.js"></script>
+  <script>
+    const dependency = document.getElementById("dependency");
+
+    if (!window.gsap) {
+      dependency.classList.add("is-visible");
+    } else {
+      const plugins = [
+        window.ScrollTrigger,
+        window.ScrollToPlugin,
+        window.MotionPathPlugin,
+        window.Flip,
+        window.Draggable,
+        window.ScrambleTextPlugin
+      ].filter(Boolean);
+
+      if (plugins.length < 6) {
+        dependency.textContent = "部分 GSAP 插件没有加载成功。页面会明确暴露这个问题，不使用隐藏回退。请检查网络或 CDN。";
+        dependency.classList.add("is-visible");
+      }
+
+      gsap.registerPlugin(...plugins);
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      function runFade() {
+        gsap.fromTo(".demo-fade", { y: 54, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, ease: "power3.out" });
+      }
+
+      function runElastic() {
+        gsap.fromTo(".demo-elastic", { scale: 0.18, rotation: -28, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.1, ease: "elastic.out(1, 0.45)" });
+      }
+
+      function runStagger() {
+        gsap.fromTo(".demo-stagger span", { y: 70, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.08, ease: "back.out(1.8)" });
+      }
+
+      function runCounter() {
+        const state = { value: 0 };
+        gsap.to(state, {
+          value: 128,
+          duration: 1.1,
+          ease: "power2.out",
+          onUpdate: () => {
+            document.getElementById("counter").textContent = Math.round(state.value);
+          }
+        });
+      }
+
+      function runText() {
+        const chars = "文字逐行出现".split("");
+        const el = document.querySelector(".demo-text");
+        el.innerHTML = chars.map((char) => `<span style="display:inline-block">${char}</span>`).join("");
+        gsap.fromTo(".demo-text span", { y: 26, autoAlpha: 0, rotation: 6 }, { y: 0, autoAlpha: 1, rotation: 0, duration: 0.42, stagger: 0.045, ease: "power3.out" });
+      }
+
+      function runFloat() {
+        gsap.killTweensOf(".demo-float");
+        gsap.fromTo(".demo-float", { x: 0, y: 34, rotation: -4 }, { y: 12, rotation: 4, duration: 1.25, ease: "sine.inOut", repeat: -1, yoyo: true });
+      }
+
+      function runPath() {
+        if (!window.MotionPathPlugin) return;
+        gsap.fromTo(".demo-path", { autoAlpha: 1 }, {
+          duration: 2.1,
+          repeat: -1,
+          ease: "none",
+          motionPath: {
+            path: "#motionPath",
+            align: "#motionPath",
+            alignOrigin: [0.5, 0.5]
+          }
+        });
+      }
+
+      function setupMouse() {
+        const stage = document.getElementById("mouseStage");
+        const dot = document.querySelector(".demo-mouse");
+        const xTo = gsap.quickTo(dot, "x", { duration: 0.35, ease: "power3.out" });
+        const yTo = gsap.quickTo(dot, "y", { duration: 0.35, ease: "power3.out" });
+        stage.addEventListener("pointermove", (event) => {
+          const rect = stage.getBoundingClientRect();
+          xTo(event.clientX - rect.left - 30);
+          yTo(event.clientY - rect.top - 64);
+        });
+      }
+
+      function runScramble() {
+        if (!window.ScrambleTextPlugin) return;
+        gsap.to("#scramble", {
+          duration: 1.2,
+          scrambleText: {
+            text: "文字解码效果",
+            chars: "01X#GSAP",
+            speed: 0.35
+          },
+          ease: "none"
+        });
+      }
+
+      function setupFlip() {
+        const stage = document.getElementById("flipStage");
+        return () => {
+          if (!window.Flip) return;
+          const state = Flip.getState(".flip-tile");
+          stage.classList.toggle("is-list");
+          Flip.from(state, { duration: 0.65, ease: "power2.inOut", absolute: true });
+        };
+      }
+
+      function setupDrag() {
+        if (!window.Draggable) return;
+        Draggable.create("#dragTarget", {
+          type: "x,y",
+          bounds: "#dragStage",
+          inertia: false
+        });
+      }
+
+      const flipToggle = setupFlip();
+      setupMouse();
+      setupDrag();
+
+      document.querySelectorAll(".replay").forEach((button) => {
+        button.addEventListener("click", () => {
+          const demo = button.dataset.demo;
+          if (demo === "fade") runFade();
+          if (demo === "elastic") runElastic();
+          if (demo === "stagger") runStagger();
+          if (demo === "counter") runCounter();
+          if (demo === "text") runText();
+          if (demo === "float") runFloat();
+          if (demo === "path") runPath();
+          if (demo === "flip") flipToggle();
+          if (demo === "scramble") runScramble();
+          if (demo === "scrollTop" && window.ScrollToPlugin) gsap.to(window, { duration: 0.9, scrollTo: "#hero", ease: "power2.inOut" });
+        });
+      });
+
+      if (!reduceMotion) {
+        const heroTimeline = gsap.timeline({ defaults: { ease: "power3.out" } });
+        heroTimeline
+          .from(".kicker", { y: 22, autoAlpha: 0, duration: 0.5 })
+          .from(".hero-word", { yPercent: 110, autoAlpha: 0, duration: 0.72, stagger: 0.09 }, "-=0.15")
+          .from(".hero-text", { y: 20, autoAlpha: 0, duration: 0.55 }, "-=0.2")
+          .from(".hero-board", { x: 50, rotation: 2, autoAlpha: 0, duration: 0.75 }, "-=0.55")
+          .from(".slab, .orbital", { scale: 0.4, rotation: -12, autoAlpha: 0, duration: 0.68, stagger: 0.07 }, "-=0.35");
+
+        window.setTimeout(() => {
+          gsap.set(".hero-word, .hero-text, .hero-board", {
+            autoAlpha: 1,
+            x: 0,
+            y: 0,
+            yPercent: 0,
+            rotation: 0,
+            clearProps: "transform,opacity,visibility"
+          });
+          gsap.set(".slab, .orbital", { autoAlpha: 1 });
+        }, 2600);
+
+        gsap.to(".orbital", { x: 245, y: 230, rotation: 360, duration: 6, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to(".slab.one", { y: 20, duration: 2.4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to(".slab.two", { x: 22, duration: 2.8, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to(".slab.three", { rotation: -10, duration: 2.2, repeat: -1, yoyo: true, ease: "sine.inOut" });
+
+        runFade();
+        runElastic();
+        runStagger();
+        runCounter();
+        runText();
+        runFloat();
+        runPath();
+        runScramble();
+
+        if (window.ScrollTrigger) {
+          gsap.utils.toArray(".card").forEach((card) => {
+            gsap.from(card, {
+              y: 42,
+              autoAlpha: 0,
+              duration: 0.65,
+              ease: "power3.out",
+              scrollTrigger: {
+                trigger: card,
+                start: "top 84%",
+                once: true
+              }
+            });
+          });
+
+          ScrollTrigger.create({
+            trigger: "#scroll",
+            start: "top top",
+            end: "bottom bottom",
+            pin: "#pinPanel",
+            pinSpacing: false
+          });
+
+          gsap.utils.toArray(".step").forEach((step) => {
+            gsap.fromTo(step, { x: 55, autoAlpha: 0.25 }, {
+              x: 0,
+              autoAlpha: 1,
+              duration: 0.5,
+              scrollTrigger: {
+                trigger: step,
+                start: "top 65%",
+                end: "bottom 42%",
+                scrub: 0.8,
+                onEnter: () => document.getElementById("scrollState").textContent = step.dataset.state,
+                onEnterBack: () => document.getElementById("scrollState").textContent = step.dataset.state
+              }
+            });
+          });
+
+          const track = document.getElementById("horizontalTrack");
+          gsap.to(track, {
+            x: () => -(track.scrollWidth - window.innerWidth + 120),
+            ease: "none",
+            scrollTrigger: {
+              trigger: "#horizontal",
+              start: "top top",
+              end: () => `+=${track.scrollWidth}`,
+              scrub: 1,
+              pin: true,
+              invalidateOnRefresh: true
+            }
+          });
+
+          document.querySelectorAll("section[id]").forEach((section) => {
+            ScrollTrigger.create({
+              trigger: section,
+              start: "top center",
+              end: "bottom center",
+              onToggle: (self) => {
+                if (!self.isActive) return;
+                document.querySelectorAll(".nav a").forEach((link) => {
+                  link.classList.toggle("is-active", link.getAttribute("href") === `#${section.id}`);
+                });
+              }
+            });
+          });
+        }
+      }
+
+      window.addEventListener("load", () => {
+        if (window.ScrollTrigger) ScrollTrigger.refresh();
+      });
+    }
+  </script>
+</body>
+</html>
