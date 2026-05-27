@@ -3,20 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GSAP 动效效果菜单</title>
+  <title>GSAP Agent 动效能力地图</title>
   <style>
     :root {
-      --ink: #171717;
-      --paper: #f4f0e8;
-      --panel: #fffaf0;
-      --line: #171717;
-      --green: #b7ff3c;
-      --blue: #2267ff;
-      --red: #ff4d3d;
-      --amber: #ffb02e;
-      --cyan: #43d9d6;
-      --muted: #6b665c;
-      --shadow: 8px 8px 0 #171717;
+      --ink: #141414;
+      --paper: #f7f2e7;
+      --panel: #fffdf7;
+      --line: #141414;
+      --green: #b8ff35;
+      --blue: #255dff;
+      --red: #ff533f;
+      --amber: #ffbd34;
+      --cyan: #37d6cf;
+      --violet: #8f63ff;
+      --muted: #615c52;
+      --shadow: 7px 7px 0 #141414;
     }
 
     * { box-sizing: border-box; }
@@ -32,164 +33,210 @@
       font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       overflow-x: hidden;
       background:
-        linear-gradient(rgba(23, 23, 23, 0.045) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(23, 23, 23, 0.045) 1px, transparent 1px),
+        linear-gradient(rgba(20, 20, 20, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(20, 20, 20, 0.045) 1px, transparent 1px),
         var(--paper);
-      background-size: 28px 28px;
+      background-size: 30px 30px;
     }
 
-    button, input { font: inherit; }
+    button { font: inherit; }
 
     .topbar {
       position: fixed;
-      z-index: 30;
+      z-index: 40;
       top: 0;
       left: 0;
       right: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
       padding: 10px 18px;
       border-bottom: 2px solid var(--line);
-      background: rgba(244, 240, 232, 0.9);
-      backdrop-filter: blur(10px);
+      background: rgba(247, 242, 231, 0.94);
+      backdrop-filter: blur(12px);
     }
 
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-weight: 900;
-      letter-spacing: 0;
+      font-weight: 950;
       white-space: nowrap;
     }
 
     .brand-mark {
-      width: 22px;
-      height: 22px;
-      background: var(--green);
+      width: 24px;
+      height: 24px;
       border: 2px solid var(--line);
+      background: var(--green);
       transform: rotate(12deg);
     }
 
     .nav {
       display: flex;
-      gap: 8px;
       flex-wrap: wrap;
       justify-content: flex-end;
+      gap: 8px;
     }
 
-    .nav a, .pill, .replay {
+    .nav a,
+    .chip,
+    .action {
       color: var(--ink);
       text-decoration: none;
       border: 2px solid var(--line);
-      background: var(--panel);
-      padding: 7px 10px;
       border-radius: 8px;
+      background: var(--panel);
+      padding: 8px 10px;
       font-size: 13px;
-      font-weight: 800;
+      font-weight: 900;
       line-height: 1;
       cursor: pointer;
     }
 
-    .nav a.is-active, .replay:hover {
+    .nav a.is-active,
+    .action:hover,
+    .action.is-hot {
       background: var(--green);
+    }
+
+    .dependency {
+      position: fixed;
+      z-index: 60;
+      left: 18px;
+      bottom: 18px;
+      max-width: min(620px, calc(100vw - 36px));
+      display: none;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--red);
+      color: white;
+      padding: 12px 14px;
+      box-shadow: 5px 5px 0 var(--line);
+      font-weight: 850;
+      line-height: 1.45;
+    }
+
+    .dependency.is-visible { display: block; }
+
+    main { position: relative; }
+
+    section {
+      padding: 76px clamp(18px, 5vw, 76px);
     }
 
     .hero {
       min-height: 100svh;
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
-      gap: clamp(22px, 4vw, 58px);
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.92fr);
+      gap: clamp(24px, 5vw, 64px);
       align-items: center;
-      padding: 110px clamp(18px, 5vw, 72px) 56px;
-    }
-
-    .hero-copy {
-      max-width: 860px;
+      padding-top: 112px;
     }
 
     .kicker {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      margin-bottom: 22px;
+      margin-bottom: 18px;
       padding: 8px 12px;
       border: 2px solid var(--line);
-      background: var(--green);
       border-radius: 8px;
-      font-weight: 900;
+      background: var(--green);
       box-shadow: 4px 4px 0 var(--line);
+      font-weight: 950;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin: 0;
     }
 
     h1 {
-      margin: 0;
-      font-size: clamp(48px, 9vw, 132px);
+      max-width: 980px;
+      font-size: clamp(48px, 8.5vw, 128px);
       line-height: 0.84;
       letter-spacing: 0;
-      max-width: 900px;
     }
 
-    .hero p {
-      margin: 26px 0 0;
-      max-width: 650px;
-      font-size: clamp(17px, 2.1vw, 24px);
-      line-height: 1.45;
-      color: #34312c;
-      font-weight: 650;
+    .hero-copy p {
+      max-width: 700px;
+      margin-top: 26px;
+      color: #302d28;
+      font-size: clamp(17px, 2vw, 23px);
+      line-height: 1.48;
+      font-weight: 750;
       overflow-wrap: anywhere;
     }
 
-    .hero-board {
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 26px;
+    }
+
+    .hero-lab {
       position: relative;
-      width: 100%;
-      min-width: 0;
-      min-height: 520px;
+      min-height: 560px;
       border: 3px solid var(--line);
       background: var(--panel);
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
-    .axis {
+    .lab-grid {
       position: absolute;
       inset: 28px;
       border: 2px solid var(--line);
       background:
-        linear-gradient(90deg, transparent 49%, rgba(23, 23, 23, 0.18) 50%, transparent 51%),
-        linear-gradient(transparent 49%, rgba(23, 23, 23, 0.18) 50%, transparent 51%);
+        linear-gradient(90deg, transparent 49%, rgba(20, 20, 20, 0.14) 50%, transparent 51%),
+        linear-gradient(transparent 49%, rgba(20, 20, 20, 0.14) 50%, transparent 51%);
       background-size: 54px 54px;
     }
 
-    .orbital {
-      position: absolute;
-      width: 82px;
-      height: 82px;
-      border: 3px solid var(--line);
-      background: var(--blue);
-      left: 44px;
-      top: 66px;
-      border-radius: 50%;
-    }
-
-    .slab {
+    .hero-node,
+    .hero-slab {
       position: absolute;
       border: 3px solid var(--line);
-      background: var(--amber);
       box-shadow: 5px 5px 0 var(--line);
     }
 
-    .slab.one { width: 180px; height: 92px; right: 42px; top: 72px; }
-    .slab.two { width: 240px; height: 118px; left: 70px; bottom: 86px; background: var(--red); }
-    .slab.three { width: 126px; height: 126px; right: 72px; bottom: 64px; background: var(--cyan); transform: rotate(12deg); }
-
-    main {
-      position: relative;
+    .hero-node {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: var(--blue);
+      left: 50px;
+      top: 72px;
     }
 
-    section {
-      padding: 72px clamp(18px, 5vw, 72px);
+    .hero-slab.one {
+      width: 190px;
+      height: 92px;
+      right: 46px;
+      top: 82px;
+      background: var(--amber);
+    }
+
+    .hero-slab.two {
+      width: 240px;
+      height: 116px;
+      left: 70px;
+      bottom: 92px;
+      background: var(--red);
+    }
+
+    .hero-slab.three {
+      width: 132px;
+      height: 132px;
+      right: 78px;
+      bottom: 70px;
+      background: var(--cyan);
+      transform: rotate(13deg);
     }
 
     .section-head {
@@ -201,28 +248,210 @@
     }
 
     h2 {
-      margin: 0;
-      font-size: clamp(32px, 5vw, 64px);
-      line-height: 0.95;
+      max-width: 820px;
+      font-size: clamp(34px, 5vw, 68px);
+      line-height: 0.94;
       letter-spacing: 0;
     }
 
     .section-note {
-      max-width: 420px;
-      margin: 0;
+      max-width: 520px;
       color: var(--muted);
-      font-weight: 700;
-      line-height: 1.5;
+      font-weight: 750;
+      line-height: 1.55;
     }
 
-    .grid {
+    .map-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 20px;
+      align-items: start;
+    }
+
+    .ability-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .ability {
+      min-height: 220px;
+      border: 2px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 5px 5px 0 var(--line);
+      padding: 15px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 10px;
+      overflow: hidden;
+    }
+
+    .ability h3 {
+      min-width: 0;
+      font-size: 20px;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .ability p {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      font-weight: 750;
+      overflow-wrap: anywhere;
+    }
+
+    .ability .chip {
+      width: fit-content;
+      max-width: 100%;
+      background: var(--green);
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
+
+    .prompt-box {
+      position: sticky;
+      top: 82px;
+      border: 3px solid var(--line);
+      border-radius: 8px;
+      background: #101010;
+      color: var(--green);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      min-height: 560px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .prompt-box h3 {
+      color: white;
+      font-size: 26px;
+    }
+
+    .prompt-box pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: clamp(18px, 2vw, 28px);
+      line-height: 1.15;
+      font-weight: 900;
+    }
+
+    .prompt-demo {
+      position: relative;
+      min-height: 168px;
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .prompt-demo::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(184, 255, 53, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(184, 255, 53, 0.08) 1px, transparent 1px);
+      background-size: 24px 24px;
+      opacity: 0.55;
+    }
+
+    .prompt-shape,
+    .prompt-dot,
+    .prompt-cardlet,
+    .prompt-bar {
+      position: absolute;
+      z-index: 1;
+      border: 2px solid var(--green);
+      background: rgba(184, 255, 53, 0.16);
+      box-shadow: 0 0 18px rgba(184, 255, 53, 0.26);
+    }
+
+    .prompt-shape {
+      width: 76px;
+      height: 76px;
+      left: 28px;
+      top: 42px;
+    }
+
+    .prompt-dot {
+      width: 22px;
+      height: 22px;
+      left: 22px;
+      top: 76px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .prompt-cardlet {
+      width: 74px;
+      height: 48px;
+      top: 62px;
+      border-color: #e8ffe8;
+      background: rgba(232, 255, 232, 0.12);
+    }
+
+    .prompt-bar {
+      width: 42px;
+      height: 72px;
+      bottom: 32px;
+      border-color: var(--cyan);
+      background: rgba(55, 214, 207, 0.2);
+    }
+
+    .prompt-path-svg {
+      position: absolute;
+      z-index: 1;
+      inset: 8px 0 0;
+      width: 100%;
+      height: 150px;
+    }
+
+    .prompt-path-svg path {
+      fill: none;
+      stroke: var(--green);
+      stroke-width: 4;
+      stroke-linecap: round;
+    }
+
+    .prompt-path-svg .prompt-dot {
+      position: static;
+      fill: var(--red);
+      stroke: var(--green);
+      stroke-width: 2;
+      background: none;
+      box-shadow: none;
+    }
+
+    .prompt-word {
+      position: relative;
+      z-index: 1;
+      display: inline-block;
+      margin: 54px 0 0 20px;
+      color: #e8ffe8;
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 950;
+    }
+
+    .prompt-meta {
+      display: grid;
+      gap: 8px;
+      color: #e8ffe8;
+      font-weight: 750;
+      line-height: 1.45;
+    }
+
+    .demo-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
     }
 
-    .card {
-      min-height: 260px;
+    .demo-card {
+      min-height: 284px;
       border: 2px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
@@ -234,118 +463,128 @@
       overflow: hidden;
     }
 
-    .card h3 {
-      margin: 0;
-      font-size: 19px;
-      letter-spacing: 0;
+    .demo-card h3 {
+      font-size: 20px;
+      line-height: 1.08;
     }
 
-    .card p {
-      margin: 0;
+    .demo-card p {
       color: var(--muted);
       font-size: 13px;
       line-height: 1.45;
-      font-weight: 700;
+      font-weight: 750;
     }
 
     .stage {
       position: relative;
-      min-height: 132px;
-      border: 2px dashed rgba(23, 23, 23, 0.35);
+      min-height: 142px;
+      border: 2px dashed rgba(20, 20, 20, 0.36);
       border-radius: 8px;
-      background: #fffdfa;
+      background: #fffdf8;
       overflow: hidden;
     }
 
-    .mini-box {
-      width: 54px;
-      height: 54px;
+    .mini-box,
+    .drag-target {
+      position: absolute;
+      width: 58px;
+      height: 58px;
+      left: 22px;
+      top: 42px;
       border: 2px solid var(--line);
       background: var(--green);
-      position: absolute;
-      left: 20px;
-      top: 38px;
       box-shadow: 4px 4px 0 var(--line);
     }
 
-    .mini-dot {
+    .orbit-dot {
+      position: absolute;
       width: 24px;
       height: 24px;
       border: 2px solid var(--line);
       border-radius: 50%;
       background: var(--red);
-      position: absolute;
-      left: 18px;
-      top: 52px;
+      left: 20px;
+      top: 58px;
     }
 
     .stagger-row {
+      height: 100%;
       display: flex;
       align-items: end;
       gap: 8px;
-      height: 100%;
       padding: 20px;
     }
 
     .stagger-row span {
-      width: 34px;
-      height: 72px;
+      display: block;
+      width: 32px;
+      height: 74px;
       border: 2px solid var(--line);
       background: var(--blue);
+    }
+
+    .timeline-stage {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      align-content: center;
+      padding: 16px;
+    }
+
+    .timeline-stage span {
+      height: 70px;
+      border: 2px solid var(--line);
+      background: var(--amber);
+      transform-origin: bottom;
+    }
+
+    .svg-stage svg {
+      width: 100%;
+      height: 142px;
       display: block;
+    }
+
+    .svg-stage path {
+      fill: none;
+      stroke: var(--line);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .motion-runner {
+      fill: var(--red);
+      stroke: var(--line);
+      stroke-width: 2;
     }
 
     .text-demo {
+      height: 100%;
       display: grid;
       place-items: center;
-      height: 100%;
       padding: 16px;
-      font-size: 30px;
-      line-height: 1.05;
-      font-weight: 950;
       text-align: center;
+      font-size: 30px;
+      line-height: 1.04;
+      font-weight: 950;
     }
 
     .number-demo {
+      height: 100%;
       display: grid;
       place-items: center;
-      height: 100%;
-      font-size: 52px;
-      font-weight: 950;
       color: var(--blue);
-    }
-
-    .path-svg {
-      width: 100%;
-      height: 132px;
-      display: block;
-    }
-
-    .path-svg path {
-      fill: none;
-      stroke: var(--line);
-      stroke-width: 3;
-      stroke-dasharray: 8 7;
-    }
-
-    .path-runner {
-      width: 24px;
-      height: 24px;
-      background: var(--red);
-      border: 2px solid var(--line);
-      border-radius: 50%;
-      position: absolute;
-      left: 0;
-      top: 0;
+      font-size: 54px;
+      font-weight: 950;
     }
 
     .flip-stage {
       display: flex;
-      gap: 8px;
-      align-items: center;
-      justify-content: center;
-      padding: 14px;
       flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding: 14px;
     }
 
     .flip-stage.is-list {
@@ -368,22 +607,30 @@
     .drag-target {
       width: 66px;
       height: 66px;
-      border: 2px solid var(--line);
       background: var(--cyan);
-      position: absolute;
-      left: 20px;
-      top: 32px;
       cursor: grab;
-      box-shadow: 4px 4px 0 var(--line);
     }
 
-    .scroll-lab {
-      padding-top: 46px;
-    }
-
-    .scroll-stack {
+    .observer-pad {
+      height: 100%;
       display: grid;
-      grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+      place-items: center;
+      padding: 16px;
+      text-align: center;
+      font-weight: 950;
+      color: white;
+      background: var(--blue);
+      user-select: none;
+      touch-action: none;
+    }
+
+    .scroll-story {
+      padding-top: 48px;
+    }
+
+    .scroll-layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.86fr) minmax(0, 1.14fr);
       gap: 24px;
       align-items: start;
     }
@@ -394,21 +641,18 @@
       background: var(--ink);
       color: var(--paper);
       box-shadow: var(--shadow);
-      padding: clamp(22px, 4vw, 42px);
+      padding: clamp(22px, 4vw, 44px);
       display: grid;
       align-content: center;
       overflow: hidden;
     }
 
     .pin-panel strong {
-      font-size: clamp(38px, 6vw, 90px);
+      font-size: clamp(38px, 6vw, 92px);
       line-height: 0.9;
-      letter-spacing: 0;
     }
 
-    .pin-panel span {
-      color: var(--green);
-    }
+    .pin-panel span { color: var(--green); }
 
     .scroll-steps {
       display: grid;
@@ -419,8 +663,8 @@
     .step {
       min-height: 42svh;
       border: 2px solid var(--line);
-      background: var(--panel);
       border-radius: 8px;
+      background: var(--panel);
       box-shadow: 5px 5px 0 var(--line);
       padding: clamp(18px, 3vw, 34px);
       display: grid;
@@ -432,23 +676,22 @@
       width: max-content;
       padding: 7px 10px;
       border: 2px solid var(--line);
-      background: var(--green);
       border-radius: 8px;
+      background: var(--green);
       margin-bottom: 16px;
     }
 
     .step h3 {
-      margin: 0 0 10px;
+      margin-bottom: 10px;
       font-size: clamp(26px, 4vw, 46px);
       line-height: 1;
     }
 
     .step p {
-      margin: 0;
       color: var(--muted);
       font-size: 17px;
       line-height: 1.5;
-      font-weight: 700;
+      font-weight: 750;
     }
 
     .horizontal-wrap {
@@ -460,19 +703,19 @@
 
     .horizontal-track {
       display: flex;
-      gap: 18px;
       width: max-content;
+      gap: 18px;
       padding: 0 8vw;
     }
 
     .wide-card {
-      width: min(76vw, 680px);
+      width: min(76vw, 690px);
       min-height: 58svh;
       border: 3px solid var(--line);
       border-radius: 8px;
-      box-shadow: var(--shadow);
       background: var(--panel);
-      padding: clamp(22px, 4vw, 42px);
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 4vw, 44px);
       display: grid;
       align-content: space-between;
     }
@@ -480,117 +723,90 @@
     .wide-card:nth-child(2) { background: var(--green); }
     .wide-card:nth-child(3) { background: var(--amber); }
     .wide-card:nth-child(4) { background: var(--cyan); }
+    .wide-card:nth-child(5) { background: #ded4ff; }
 
     .wide-card h3 {
-      margin: 0;
-      font-size: clamp(36px, 6vw, 76px);
-      line-height: 0.9;
+      max-width: 100%;
+      font-size: clamp(34px, 5.2vw, 64px);
+      line-height: 0.92;
+      overflow-wrap: anywhere;
+      word-break: normal;
     }
 
     .wide-card p {
-      margin: 24px 0 0;
-      max-width: 440px;
-      font-weight: 800;
-      line-height: 1.45;
+      margin-top: 24px;
+      max-width: 480px;
       color: #28251f;
+      font-weight: 850;
+      line-height: 1.45;
     }
 
-    .playground {
+    .agent-guide {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
-      gap: 18px;
-      align-items: stretch;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
     }
 
-    .console {
-      border: 3px solid var(--line);
-      background: #101010;
-      color: var(--green);
-      min-height: 420px;
-      border-radius: 8px;
-      padding: 22px;
-      box-shadow: var(--shadow);
-      display: grid;
-      align-content: center;
-      overflow: hidden;
-    }
-
-    .console pre {
-      margin: 0;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-size: clamp(22px, 4vw, 52px);
-      line-height: 1.05;
-      font-weight: 950;
-    }
-
-    .request-panel {
+    .guide-card {
+      min-height: 230px;
       border: 2px solid var(--line);
+      border-radius: 8px;
       background: var(--panel);
-      border-radius: 8px;
       box-shadow: 5px 5px 0 var(--line);
-      padding: 18px;
+      padding: 16px;
       display: grid;
-      align-content: start;
       gap: 12px;
+      align-content: start;
     }
 
-    .request-panel h3 {
-      margin: 0;
-      font-size: 24px;
+    .guide-card h3 {
+      font-size: 20px;
+      line-height: 1.1;
     }
 
-    .request-panel p {
-      margin: 0;
+    .guide-card p,
+    .guide-card code {
       color: var(--muted);
+      font-size: 13px;
       line-height: 1.45;
-      font-weight: 700;
+      font-weight: 750;
     }
 
-    .prompt {
+    .guide-card code {
+      display: block;
+      padding: 10px;
       border: 2px solid var(--line);
-      background: #fffdfa;
       border-radius: 8px;
-      padding: 12px;
-      font-weight: 800;
-      line-height: 1.45;
+      background: #fffdf8;
+      color: var(--ink);
+      overflow-wrap: anywhere;
     }
 
-    .dependency {
-      position: fixed;
-      z-index: 50;
-      left: 18px;
-      bottom: 18px;
-      max-width: min(520px, calc(100vw - 36px));
-      border: 2px solid var(--line);
-      background: var(--red);
-      color: white;
-      padding: 12px 14px;
-      border-radius: 8px;
-      box-shadow: 5px 5px 0 var(--line);
-      font-weight: 800;
-      display: none;
-    }
+    @media (max-width: 1120px) {
+      .ability-grid,
+      .demo-grid,
+      .agent-guide {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
 
-    .dependency.is-visible { display: block; }
-
-    @media (max-width: 980px) {
       .hero,
-      .scroll-stack,
-      .playground {
+      .map-layout,
+      .scroll-layout {
         grid-template-columns: 1fr;
       }
 
-      .hero-board {
-        min-height: 360px;
+      .prompt-box {
+        position: relative;
+        top: 0;
+        min-height: 420px;
       }
 
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+      .hero-lab {
+        min-height: 430px;
       }
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 680px) {
       .topbar {
         align-items: start;
         flex-direction: column;
@@ -601,58 +817,40 @@
       }
 
       .hero {
-        padding-top: 154px;
-        padding-left: 24px;
-        padding-right: 24px;
-        overflow: hidden;
+        padding-top: 166px;
       }
 
-      .hero p {
-        max-width: 100%;
-        font-size: 16px;
-      }
-
-      .hero-board {
-        width: min(300px, calc(100vw - 64px));
-        max-width: min(300px, calc(100vw - 64px));
-        min-height: 320px;
+      .hero-lab {
+        min-height: 330px;
         box-shadow: 5px 5px 0 var(--line);
       }
 
-      .axis {
-        inset: 28px;
+      .hero-node {
+        width: 44px;
+        height: 44px;
+        left: 44px;
+        top: 68px;
       }
 
-      .slab.one {
-        width: 96px;
-        height: 52px;
-        right: 34px;
-        top: 74px;
-      }
-
-      .slab.two {
-        width: 120px;
-        height: 62px;
-        left: 74px;
-        bottom: 86px;
-      }
-
-      .slab.three {
-        width: 58px;
+      .hero-slab.one {
+        width: 102px;
         height: 58px;
-        right: 74px;
-        bottom: 64px;
+        right: 34px;
+        top: 78px;
       }
 
-      .orbital {
-        width: 42px;
-        height: 42px;
-        left: 56px;
-        top: 80px;
+      .hero-slab.two {
+        width: 132px;
+        height: 66px;
+        left: 60px;
+        bottom: 70px;
       }
 
-      .grid {
-        grid-template-columns: 1fr;
+      .hero-slab.three {
+        width: 64px;
+        height: 64px;
+        right: 56px;
+        bottom: 58px;
       }
 
       .section-head {
@@ -660,8 +858,10 @@
         flex-direction: column;
       }
 
-      .horizontal-track {
-        padding: 0 18px;
+      .ability-grid,
+      .demo-grid,
+      .agent-guide {
+        grid-template-columns: 1fr;
       }
 
       .wide-card {
@@ -681,137 +881,254 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>GSAP 动效效果菜单</span></div>
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span>GSAP Agent 动效能力地图</span></div>
     <nav class="nav" aria-label="页面导航">
-      <a href="#basic">基础动画</a>
+      <a href="#map">能力地图</a>
+      <a href="#demos">效果实验</a>
       <a href="#scroll">滚动叙事</a>
       <a href="#horizontal">横向滚动</a>
-      <a href="#plugins">插件效果</a>
+      <a href="#agent">Agent 调用</a>
     </nav>
   </header>
 
-  <div class="dependency" id="dependency">
-    GSAP 依赖没有加载成功。这个页面使用 CDN 版本的 GSAP；如果离线打开，请先联网，或者把 GSAP 脚本下载成本地文件。
-  </div>
+  <div class="dependency" id="dependency"></div>
 
   <main>
     <section class="hero" id="hero">
       <div class="hero-copy">
-        <div class="kicker">不会描述动效时，就从这里选</div>
-        <h1><span class="hero-word">GSAP</span><br><span class="hero-word">效果</span><br><span class="hero-word">菜单</span></h1>
-        <p class="hero-text">这不是 API 文档，而是给需求描述用的可视化手册：淡入、交错、弹性、路径、滚动固定、横向滚动、文字解码、拖拽和布局切换。</p>
+        <div class="kicker">把“我要高级动效”翻译成 Agent 听得懂的话</div>
+        <h1><span class="hero-word">GSAP</span><br><span class="hero-word">能力地图</span><br><span class="hero-word">给 Codex 用</span></h1>
+        <p class="hero-text">这个页面不是单纯放几个炫技动画，而是把 GSAP 的能力拆成可点、可看、可复述的效果名。你可以直接复制每张卡片里的叫法去跟 Codex、ChatGPT、Claude 说。</p>
+        <div class="hero-actions">
+          <a class="action is-hot" href="#map">先看能力地图</a>
+          <a class="action" href="#agent">看 Agent 话术</a>
+        </div>
       </div>
-      <div class="hero-board" aria-label="GSAP hero animation preview">
-        <div class="axis"></div>
-        <div class="orbital"></div>
-        <div class="slab one"></div>
-        <div class="slab two"></div>
-        <div class="slab three"></div>
+      <div class="hero-lab" aria-label="GSAP hero animation preview">
+        <div class="lab-grid"></div>
+        <div class="hero-node"></div>
+        <div class="hero-slab one"></div>
+        <div class="hero-slab two"></div>
+        <div class="hero-slab three"></div>
       </div>
     </section>
 
-    <section id="basic">
-      <div class="section-head">
-        <h2>基础动画</h2>
-        <p class="section-note">这些是下指令时最常用的词：淡入、滑入、缩放、旋转、交错、数字滚动和路径运动。</p>
+    <section id="map">
+      <div class="map-layout">
+        <div class="ability-grid">
+          <article class="ability" data-prompt="core">
+            <span class="chip">gsap-core</span>
+            <h3>Core Tween 基础补间</h3>
+            <p>淡入、滑入、缩放、旋转、弹性、stagger、数字滚动。适合 UI 元素入场和微交互。</p>
+            <button class="action" data-focus="core">看怎么说</button>
+          </article>
+          <article class="ability" data-prompt="timeline">
+            <span class="chip">gsap-timeline</span>
+            <h3>Timeline 时间线编排</h3>
+            <p>多个动作按标签、相对位置和重叠关系编排。适合首屏、产品流程、结尾 CTA。</p>
+            <button class="action" data-focus="timeline">看怎么说</button>
+          </article>
+          <article class="ability" data-prompt="scrolltrigger">
+            <span class="chip">gsap-scrolltrigger</span>
+            <h3>ScrollTrigger 滚动触发</h3>
+            <p>滚到某一段才开始动，也可以固定一屏，让内容跟着滚动慢慢变化。</p>
+            <button class="action" data-focus="scrolltrigger">看怎么说</button>
+          </article>
+          <article class="ability" data-prompt="flip">
+            <span class="chip">gsap-plugins / Flip</span>
+            <h3>Flip 布局状态切换</h3>
+            <p>网格变列表、卡片展开详情、筛选重排、拖拽后回位。重点是“前后状态变化”。</p>
+            <button class="action" data-focus="flip">看怎么说</button>
+          </article>
+          <article class="ability" data-prompt="drag">
+            <span class="chip">gsap-plugins / Draggable</span>
+            <h3>Draggable + Inertia 拖拽惯性</h3>
+            <p>可拖动卡片、旋钮、滑块、看板、抛掷惯性。适合需要真实手感的交互。</p>
+            <button class="action" data-focus="drag">看怎么说</button>
+          </article>
+          <article class="ability" data-prompt="svg">
+            <span class="chip">SVG 动效</span>
+            <h3>SVG 轨迹和形变</h3>
+            <p>元素沿路径走、线条描边出现、图标从一个形状变成另一个形状。</p>
+            <button class="action" data-focus="svg">看怎么说</button>
+          </article>
+          <article class="ability" data-prompt="text">
+            <span class="chip">SplitText / ScrambleText</span>
+            <h3>文字切分和解码</h3>
+            <p>逐字、逐词、逐行入场，或乱码解码。适合标题、口号、章节切换。</p>
+            <button class="action" data-focus="text">看怎么说</button>
+          </article>
+          <article class="ability" data-prompt="observer">
+            <span class="chip">Observer</span>
+            <h3>滚轮、触摸、指针手势</h3>
+            <p>统一处理 wheel、touch、pointer。适合滑动切页、方向识别、手势导航。</p>
+            <button class="action" data-focus="observer">看怎么说</button>
+          </article>
+          <article class="ability" data-prompt="react">
+            <span class="chip">@gsap/react</span>
+            <h3>React / Next 正确用法</h3>
+            <p>适合组件页面。动画只影响当前组件，页面切走后要自动停掉。</p>
+            <button class="action" data-focus="react">看怎么说</button>
+          </article>
+        </div>
+
+        <aside class="prompt-box">
+          <h3>给 Agent 的描述</h3>
+          <pre id="promptText"></pre>
+          <div class="prompt-demo" id="promptDemo" aria-hidden="true"></div>
+          <div class="prompt-meta">
+            <span id="promptName"></span>
+            <span>说清楚：哪里开始动、哪个东西动、怎么动、最后停在哪里。</span>
+          </div>
+        </aside>
       </div>
-      <div class="grid">
-        <article class="card">
-          <h3>淡入 + 上滑</h3>
+    </section>
+
+    <section id="demos">
+      <div class="section-head">
+        <h2>效果实验区</h2>
+        <p class="section-note">看到喜欢的效果，直接照着卡片里的句子跟 Agent 说。</p>
+      </div>
+      <div class="demo-grid">
+        <article class="demo-card">
+          <h3>Core：淡入上滑</h3>
           <div class="stage"><div class="mini-box demo-fade"></div></div>
-          <p>说法：从下方滑入并淡入。</p>
-          <button class="replay" data-demo="fade">重播</button>
+          <p>你可以说：让这个元素从下面轻轻滑上来，同时慢慢出现。</p>
+          <button class="action" data-demo="fade">重播</button>
         </article>
-
-        <article class="card">
-          <h3>弹性入场</h3>
+        <article class="demo-card">
+          <h3>Core：弹性入场</h3>
           <div class="stage"><div class="mini-box demo-elastic"></div></div>
-          <p>说法：有一点回弹，不要死板。</p>
-          <button class="replay" data-demo="elastic">重播</button>
+          <p>你可以说：让它弹出来，带一点回弹和旋转，不要硬邦邦。</p>
+          <button class="action" data-demo="elastic">重播</button>
         </article>
-
-        <article class="card">
-          <h3>交错出现</h3>
+        <article class="demo-card">
+          <h3>Stagger：交错出现</h3>
           <div class="stage">
-            <div class="stagger-row demo-stagger">
-              <span></span><span></span><span></span><span></span><span></span>
-            </div>
+            <div class="stagger-row demo-stagger"><span></span><span></span><span></span><span></span><span></span></div>
           </div>
-          <p>说法：多个卡片依次出现。</p>
-          <button class="replay" data-demo="stagger">重播</button>
+          <p>你可以说：这些卡片一个接一个出现，节奏要顺，不要同时冒出来。</p>
+          <button class="action" data-demo="stagger">重播</button>
         </article>
-
-        <article class="card">
-          <h3>数字滚动</h3>
+        <article class="demo-card">
+          <h3>Timeline：分镜编排</h3>
+          <div class="stage timeline-stage demo-timeline"><span></span><span></span><span></span><span></span></div>
+          <p>你可以说：把几个动作排成一段小分镜，先后顺序和重叠节奏帮我安排好。</p>
+          <button class="action" data-demo="timeline">重播</button>
+        </article>
+        <article class="demo-card">
+          <h3>Counter：数字滚动</h3>
           <div class="stage"><div class="number-demo" id="counter">0</div></div>
-          <p>说法：数字从 0 增长到目标值。</p>
-          <button class="replay" data-demo="counter">重播</button>
+          <p>你可以说：数字不要一下跳到结果，要从 0 顺滑滚到目标值。</p>
+          <button class="action" data-demo="counter">重播</button>
         </article>
-
-        <article class="card">
-          <h3>文字揭示</h3>
-          <div class="stage"><div class="text-demo demo-text">文字逐行出现</div></div>
-          <p>说法：标题逐字或逐行出现。</p>
-          <button class="replay" data-demo="text">重播</button>
-        </article>
-
-        <article class="card">
-          <h3>悬浮感</h3>
-          <div class="stage"><div class="mini-box demo-float"></div></div>
-          <p>说法：产品截图轻微上下浮动。</p>
-          <button class="replay" data-demo="float">重播</button>
-        </article>
-
-        <article class="card">
-          <h3>路径运动</h3>
-          <div class="stage">
-            <svg class="path-svg" viewBox="0 0 220 132" aria-hidden="true">
-              <path id="motionPath" d="M15 100 C55 10, 100 10, 118 72 S176 126, 206 32"></path>
+        <article class="demo-card">
+          <h3>MotionPath：沿路径运动</h3>
+          <div class="stage svg-stage">
+            <svg viewBox="0 0 240 142" aria-hidden="true">
+              <path id="motionPath" d="M20 104 C60 10, 112 12, 128 74 S194 132, 220 34"></path>
+              <circle class="motion-runner demo-path" r="10" cx="20" cy="104"></circle>
             </svg>
-            <div class="path-runner demo-path"></div>
           </div>
-          <p>说法：元素沿着一条线移动。</p>
-          <button class="replay" data-demo="path">重播</button>
+          <p>你可以说：让这个点沿着这条曲线移动，像沿轨道滑过去。</p>
+          <button class="action" data-demo="path">重播</button>
         </article>
-
-        <article class="card">
-          <h3>鼠标跟随</h3>
-          <div class="stage" id="mouseStage"><div class="mini-dot demo-mouse"></div></div>
-          <p>说法：光点跟随鼠标，移动要顺滑。</p>
-          <button class="replay" data-demo="mouse">移动鼠标</button>
+        <article class="demo-card">
+          <h3>DrawSVG：线条描边</h3>
+          <div class="stage svg-stage">
+            <svg viewBox="0 0 240 142" aria-hidden="true">
+              <path id="drawPath" d="M26 102 C52 28, 94 28, 118 82 C146 140, 190 118, 214 34"></path>
+            </svg>
+          </div>
+          <p>你可以说：这条线不要直接出现，要像被一笔画出来一样。</p>
+          <button class="action" data-demo="draw">重播</button>
+        </article>
+        <article class="demo-card">
+          <h3>MorphSVG：形状变形</h3>
+          <div class="stage svg-stage">
+            <svg viewBox="0 0 240 142" aria-hidden="true">
+              <path id="morphShape" fill="#b8ff35" stroke="#141414" stroke-width="4" d="M72 26 L168 26 L202 72 L168 116 L72 116 L38 72 Z"></path>
+            </svg>
+          </div>
+          <p>你可以说：让这个形状慢慢变成另一个形状，中间要很顺。</p>
+          <button class="action" data-demo="morph">重播</button>
+        </article>
+        <article class="demo-card">
+          <h3>SplitText：逐字标题</h3>
+          <div class="stage"><div class="text-demo" id="splitText">逐字出现</div></div>
+          <p>你可以说：标题按字、按词或按行依次出现，像一句话被揭开。</p>
+          <button class="action" data-demo="split">重播</button>
+        </article>
+        <article class="demo-card">
+          <h3>ScrambleText：文字解码</h3>
+          <div class="stage"><div class="text-demo" id="scramble">GSAP EFFECTS</div></div>
+          <p>你可以说：文字先像乱码一样闪动，然后解码成正常标题。</p>
+          <button class="action" data-demo="scramble">重播</button>
+        </article>
+        <article class="demo-card">
+          <h3>Flip：布局切换</h3>
+          <div class="stage flip-stage" id="flipStage">
+            <div class="flip-tile"></div><div class="flip-tile"></div><div class="flip-tile"></div><div class="flip-tile"></div>
+          </div>
+          <p>你可以说：卡片从网格切到列表时，位置要平滑移动过去。</p>
+          <button class="action" data-demo="flip">切换</button>
+        </article>
+        <article class="demo-card">
+          <h3>Draggable：拖拽惯性</h3>
+          <div class="stage" id="dragStage"><div class="drag-target" id="dragTarget"></div></div>
+          <p>你可以说：这个方块可以拖动，但只能在框里移动，松手要有一点惯性。</p>
+          <button class="action" data-demo="drag">拖动方块</button>
+        </article>
+        <article class="demo-card">
+          <h3>Observer：手势方向</h3>
+          <div class="stage"><div class="observer-pad" id="observerPad">滚轮 / 拖动 / 触摸<br><span id="observerText">等待方向</span></div></div>
+          <p>你可以说：识别鼠标滚轮、手指滑动和拖动方向，用来切换内容。</p>
+          <button class="action" data-demo="observer">试试滚轮或拖动</button>
+        </article>
+        <article class="demo-card">
+          <h3>QuickTo：鼠标跟随</h3>
+          <div class="stage" id="mouseStage"><div class="orbit-dot demo-mouse"></div></div>
+          <p>你可以说：让这个小光点跟着鼠标走，但不要贴得太死，要有顺滑跟随感。</p>
+          <button class="action" data-demo="mouse">移动鼠标</button>
+        </article>
+        <article class="demo-card">
+          <h3>ScrollTo：平滑跳转</h3>
+          <div class="stage"><div class="text-demo">跳到顶部</div></div>
+          <p>你可以说：点击按钮后，页面平滑滚到指定位置，不要瞬间跳过去。</p>
+          <button class="action" data-demo="scrollTop">执行</button>
         </article>
       </div>
     </section>
 
-    <section class="scroll-lab" id="scroll">
+    <section class="scroll-story" id="scroll">
       <div class="section-head">
-        <h2>滚动叙事</h2>
-        <p class="section-note">这一段展示 pin、scrub、分步骤出现和视觉状态切换。向下滚动时，左侧固定，右侧逐条解释。</p>
+        <h2>ScrollTrigger 不是只做入场动画</h2>
+        <p class="section-note">它可以让页面跟着滚动讲故事：滚到哪里，画面就变化到哪里；某一屏还能先固定住，再一步步展开内容。</p>
       </div>
-      <div class="scroll-stack">
+      <div class="scroll-layout">
         <aside class="pin-panel" id="pinPanel">
           <strong>Scroll<br><span id="scrollState">Trigger</span></strong>
         </aside>
         <div class="scroll-steps">
-          <article class="step" data-state="进入视口">
+          <article class="step" data-state="Trigger">
             <b>01</b>
             <h3>进入视口才触发</h3>
-            <p>适合“滚到这里再动”的内容，比如功能卡、案例、数据图表。</p>
+            <p>你可以说：每张卡片滚到快看见的时候再慢慢出现，不要页面一打开就全部播放。</p>
           </article>
-          <article class="step" data-state="Pin 固定">
+          <article class="step" data-state="Pin">
             <b>02</b>
             <h3>固定一屏讲故事</h3>
-            <p>适合产品流程、历史线、教程分镜。画面固定，内容逐步变化。</p>
+            <p>你可以说：左边画面先固定住，右边步骤继续滚动，每滚到一步就换一次画面状态。</p>
           </article>
-          <article class="step" data-state="Scrub 绑定">
+          <article class="step" data-state="Scrub">
             <b>03</b>
-            <h3>动画跟滚动条绑定</h3>
-            <p>滚动多少，动画就走多少。适合进度感很强的交互叙事。</p>
+            <h3>动画绑定滚动进度</h3>
+            <p>你可以说：动画不要自己播完，要跟着我的滚动速度走；我滚多少，它就走多少。</p>
           </article>
-          <article class="step" data-state="Parallax">
+          <article class="step" data-state="Batch">
             <b>04</b>
-            <h3>图文错位视差</h3>
-            <p>背景慢一点，前景快一点，页面会更有深度。</p>
+            <h3>批量进入也要有节奏</h3>
+            <p>你可以说：列表很多时也要一组一组有节奏地出现，不要乱七八糟同时跳出来。</p>
           </article>
         </div>
       </div>
@@ -820,77 +1137,54 @@
     <section id="horizontal" class="horizontal-wrap">
       <div class="horizontal-track" id="horizontalTrack">
         <article class="wide-card">
-          <h3>横向滚动</h3>
-          <p>指令说法：用户向下滚动，但内容横向移动。</p>
+          <h3>横向滚动效果</h3>
+          <p>你可以说：我想让这一整组卡片在用户向下滚动时，像横向展览墙一样从右往左滑过去。</p>
         </article>
         <article class="wide-card">
-          <h3>适合作品集</h3>
-          <p>让多个案例像展览墙一样横向展开，信息密度更高。</p>
+          <h3>横向里再做动画</h3>
+          <p>你可以说：横向滑动过程中，每张卡片进入中间位置时，再触发自己的小动画。</p>
         </article>
         <article class="wide-card">
-          <h3>也适合流程</h3>
-          <p>采购流程、AI pipeline、视频制作步骤都可以用这种方式。</p>
+          <h3>固定住再滑动</h3>
+          <p>你可以说：这一屏先固定住，用户继续往下滚时，里面的内容横向移动。</p>
         </article>
         <article class="wide-card">
-          <h3>重点是边界</h3>
-          <p>移动端要检查宽度、触发距离和文字是否被挤压。</p>
+          <h3>一屏一屏停住</h3>
+          <p>你可以说：每张卡片滑到屏幕中间时稍微停一下，像轮播一样一屏一屏对齐。</p>
+        </article>
+        <article class="wide-card">
+          <h3>别滑过头</h3>
+          <p>你可以说：最后一张卡片刚好停在可见区域里，不要多滑出一大片空白。</p>
         </article>
       </div>
     </section>
 
-    <section id="plugins">
+    <section id="agent">
       <div class="section-head">
-        <h2>插件效果</h2>
-        <p class="section-note">这些效果更像“高级动效词”：Flip、Draggable、ScrambleText。用户不用懂代码，只要说想要的状态变化。</p>
+        <h2>跟 Codex / Agent 正确描述</h2>
+        <p class="section-note">Agent 最怕“你帮我做高级一点”。正确方式是给效果名、触发时机、目标、边界和验收标准。</p>
       </div>
-      <div class="grid">
-        <article class="card">
-          <h3>Flip 布局切换</h3>
-          <div class="stage flip-stage" id="flipStage">
-            <div class="flip-tile"></div><div class="flip-tile"></div><div class="flip-tile"></div><div class="flip-tile"></div>
-          </div>
-          <p>说法：卡片从网格平滑切成列表。</p>
-          <button class="replay" data-demo="flip">切换布局</button>
+      <div class="agent-guide">
+        <article class="guide-card">
+          <h3>1. 说效果名</h3>
+          <p>直接点名能力，比形容词靠谱。</p>
+          <code>用 GSAP ScrollTrigger 做 pinned scroll story，左侧固定，右侧步骤驱动状态变化。</code>
         </article>
-
-        <article class="card">
-          <h3>Draggable 拖拽</h3>
-          <div class="stage" id="dragStage"><div class="drag-target" id="dragTarget"></div></div>
-          <p>说法：这个卡片可以拖动，并限制在容器内。</p>
-          <button class="replay" data-demo="drag">拖动方块</button>
+        <article class="guide-card">
+          <h3>2. 说触发时机</h3>
+          <p>页面加载、滚到视口、点击、hover、拖拽、滚轮方向，都要明确。</p>
+          <code>卡片滚到视口 80% 时 stagger 淡入；返回上滚时不要重复播放。</code>
         </article>
-
-        <article class="card">
-          <h3>ScrambleText 解码</h3>
-          <div class="stage"><div class="text-demo" id="scramble">GSAP EFFECTS</div></div>
-          <p>说法：标题像乱码解码一样出现。</p>
-          <button class="replay" data-demo="scramble">重播</button>
+        <article class="guide-card">
+          <h3>3. 说技术边界</h3>
+          <p>React 项目要说清楚动画只在当前组件里生效；静态页要说加载失败时直接提示。</p>
+          <code>这是 React 页面，动画只作用在这个组件里，页面切走后要自动清理。</code>
         </article>
-
-        <article class="card">
-          <h3>ScrollTo 平滑跳转</h3>
-          <div class="stage"><div class="text-demo">跳到顶部</div></div>
-          <p>说法：点击按钮平滑滚到指定区域。</p>
-          <button class="replay" data-demo="scrollTop">执行</button>
+        <article class="guide-card">
+          <h3>4. 说验收标准</h3>
+          <p>要求浏览器实测，不要只看代码。</p>
+          <code>桌面和手机都要截图检查；滚动动画不能空白、不能遮住文字、不能横向溢出。</code>
         </article>
-      </div>
-    </section>
-
-    <section>
-      <div class="playground">
-        <div class="console"><pre id="promptText">用 GSAP 做一个动效网页。
-首屏标题分层入场；
-第二屏 pin 住讲故事；
-卡片 stagger 出现；
-最后 CTA 聚焦收尾。</pre></div>
-        <aside class="request-panel">
-          <h3>不会描述时就这样说</h3>
-          <p>你不需要背 API，只要说清楚“触发时机 + 元素 + 动作 + 状态”。</p>
-          <div class="prompt">触发时机：页面打开 / 滚动到这里 / 鼠标悬停 / 点击后</div>
-          <div class="prompt">元素：标题 / 卡片 / 图片 / SVG / 数字 / 按钮</div>
-          <div class="prompt">动作：淡入 / 滑入 / 缩放 / 固定 / 横向移动 / 解码 / 拖拽</div>
-          <div class="prompt">状态：依次出现 / 跟随滚动 / 有回弹 / 最后停在完整位置</div>
-        </aside>
       </div>
     </section>
   </main>
@@ -901,103 +1195,279 @@
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MotionPathPlugin.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Flip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Draggable.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/InertiaPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/Observer.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrambleTextPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/MorphSVGPlugin.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/DrawSVGPlugin.min.js"></script>
   <script>
+    const prompts = {
+      core: {
+        name: "适合：单个元素入场、按钮反馈、卡片依次出现",
+        text: "你可以说：我想让页面里的标题、卡片或按钮动得更自然。比如从下方滑进来、慢慢出现、轻微放大、带一点回弹，整体不要僵硬。"
+      },
+      timeline: {
+        name: "适合：一段连续分镜、首屏开场、流程演示",
+        text: "你可以说：我想要一段有先后顺序的动画。先让小标签出现，再让标题进入，然后说明文字和右边图形跟上，像一段小开场。"
+      },
+      scrolltrigger: {
+        name: "适合：滚到这里再动、固定一屏讲故事、横向滚动",
+        text: "你可以说：我想让动画跟滚动有关。用户滚到这一段时才开始动；某一屏先固定住，继续往下滚时内容一步步变化。"
+      },
+      flip: {
+        name: "适合：网格变列表、卡片展开、筛选后重新排列",
+        text: "你可以说：我想让布局变化时不要突然跳位置。比如卡片从网格变成列表，或者点击后展开详情，位置要平滑移动过去。"
+      },
+      drag: {
+        name: "适合：拖动卡片、旋钮、滑块、可交互面板",
+        text: "你可以说：我想让这个元素可以被拖动，但只能在指定区域里移动。松手的时候最好有一点惯性，像真实物体一样。"
+      },
+      svg: {
+        name: "适合：沿曲线移动、线条被画出来、图形变形",
+        text: "你可以说：我想让一个点沿着曲线走；或者让一条线像手绘一样出现；也可以让一个图形慢慢变成另一个图形。"
+      },
+      text: {
+        name: "适合：标题逐字出现、逐行揭示、乱码解码",
+        text: "你可以说：我想让标题不要整块出现，而是按字、按词或按行依次出现。也可以先像乱码一样闪动，再变成正常标题。"
+      },
+      observer: {
+        name: "适合：滚轮方向、手指滑动、拖动切换内容",
+        text: "你可以说：我想用鼠标滚轮、手指滑动或拖动方向来切换内容。上滑下一页，下滑上一页，别一滑就连续跳很多次。"
+      },
+      react: {
+        name: "适合：React / Next 项目里安全使用动画",
+        text: "你可以说：这是 React 或 Next 页面，请把动画限制在当前组件里，组件离开页面后要自动清理，不要影响其他组件，也不要造成页面切换后还在动。"
+      }
+    };
+
     const dependency = document.getElementById("dependency");
+    const promptText = document.getElementById("promptText");
+    const promptName = document.getElementById("promptName");
+    const promptDemo = document.getElementById("promptDemo");
+
+    function setPrompt(key) {
+      const item = prompts[key] || prompts.scrolltrigger;
+      promptText.textContent = item.text;
+      promptName.textContent = item.name;
+      renderPromptDemo(key);
+    }
+
+    function renderPromptDemo(key) {
+      if (!promptDemo) return;
+      if (window.gsap) gsap.killTweensOf(promptDemo.querySelectorAll("*"));
+      const type = prompts[key] ? key : "scrolltrigger";
+
+      if (type === "timeline") {
+        promptDemo.innerHTML = '<span class="prompt-cardlet"></span><span class="prompt-cardlet"></span><span class="prompt-cardlet"></span>';
+        promptDemo.querySelectorAll(".prompt-cardlet").forEach((el, index) => {
+          el.style.left = `${26 + index * 88}px`;
+        });
+        if (window.gsap) {
+          gsap.fromTo(".prompt-cardlet", { y: 34, autoAlpha: 0, rotation: -8 }, { y: 0, autoAlpha: 1, rotation: 0, duration: 0.55, stagger: 0.16, ease: "back.out(1.8)" });
+        }
+        return;
+      }
+
+      if (type === "scrolltrigger") {
+        promptDemo.innerHTML = '<span class="prompt-shape"></span><span class="prompt-bar"></span><span class="prompt-bar"></span><span class="prompt-bar"></span>';
+        promptDemo.querySelector(".prompt-shape").style.left = "24px";
+        promptDemo.querySelector(".prompt-shape").style.top = "46px";
+        promptDemo.querySelectorAll(".prompt-bar").forEach((el, index) => {
+          el.style.left = `${132 + index * 58}px`;
+          el.style.height = `${54 + index * 18}px`;
+        });
+        if (window.gsap) {
+          gsap.fromTo(".prompt-bar", { scaleY: 0.2, transformOrigin: "bottom" }, { scaleY: 1, duration: 0.8, stagger: 0.12, ease: "power3.out" });
+          gsap.to(".prompt-shape", { y: 18, duration: 1.2, repeat: 1, yoyo: true, ease: "sine.inOut" });
+        }
+        return;
+      }
+
+      if (type === "flip") {
+        promptDemo.innerHTML = '<span class="prompt-cardlet"></span><span class="prompt-cardlet"></span><span class="prompt-cardlet"></span><span class="prompt-cardlet"></span>';
+        const cards = promptDemo.querySelectorAll(".prompt-cardlet");
+        cards.forEach((el, index) => {
+          el.style.left = `${24 + (index % 2) * 92}px`;
+          el.style.top = `${34 + Math.floor(index / 2) * 62}px`;
+        });
+        if (window.gsap) {
+          gsap.to(cards, { left: (index) => `${26 + index * 84}px`, top: 72, duration: 0.8, stagger: 0.04, ease: "power3.inOut" });
+        }
+        return;
+      }
+
+      if (type === "drag") {
+        promptDemo.innerHTML = '<span class="prompt-shape"></span>';
+        if (window.gsap) {
+          gsap.to(".prompt-shape", { x: 190, duration: 1.1, ease: "power3.out" });
+          gsap.to(".prompt-shape", { x: 132, duration: 0.7, delay: 1.1, ease: "elastic.out(1, 0.45)" });
+        }
+        return;
+      }
+
+      if (type === "svg") {
+        promptDemo.innerHTML = '<svg class="prompt-path-svg" viewBox="0 0 360 150"><path id="promptMotionPath" d="M22 106 C70 12, 144 20, 174 86 S292 130, 334 32"></path><circle class="prompt-dot" id="promptMotionDot" r="10" cx="22" cy="106"></circle></svg>';
+        if (window.gsap && window.MotionPathPlugin) {
+          gsap.to("#promptMotionDot", { duration: 2, repeat: -1, ease: "none", motionPath: { path: "#promptMotionPath", align: "#promptMotionPath", alignOrigin: [0.5, 0.5] } });
+        }
+        return;
+      }
+
+      if (type === "text") {
+        promptDemo.innerHTML = '<span class="prompt-word">逐字出现</span>';
+        if (window.gsap) {
+          const word = promptDemo.querySelector(".prompt-word");
+          word.innerHTML = "逐字出现".split("").map((char) => `<span style="display:inline-block">${char}</span>`).join("");
+          gsap.fromTo(".prompt-word span", { y: 26, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.42, stagger: 0.08, ease: "power3.out" });
+        }
+        return;
+      }
+
+      if (type === "observer") {
+        promptDemo.innerHTML = '<span class="prompt-word">上滑 / 下滑</span>';
+        if (window.gsap) {
+          gsap.fromTo(".prompt-word", { y: 28, rotation: -4 }, { y: -18, rotation: 4, duration: 0.7, repeat: 1, yoyo: true, ease: "sine.inOut" });
+        }
+        return;
+      }
+
+      if (type === "react") {
+        promptDemo.innerHTML = '<span class="prompt-cardlet"></span><span class="prompt-shape"></span>';
+        promptDemo.querySelector(".prompt-cardlet").style.left = "28px";
+        promptDemo.querySelector(".prompt-cardlet").style.top = "60px";
+        promptDemo.querySelector(".prompt-shape").style.left = "144px";
+        promptDemo.querySelector(".prompt-shape").style.top = "44px";
+        if (window.gsap) {
+          gsap.fromTo(".prompt-cardlet, .prompt-shape", { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.12, ease: "power3.out" });
+        }
+        return;
+      }
+
+      promptDemo.innerHTML = '<span class="prompt-shape"></span><span class="prompt-dot"></span>';
+      if (window.gsap) {
+        gsap.fromTo(".prompt-shape", { y: 40, autoAlpha: 0, scale: 0.7 }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.7, ease: "back.out(1.7)" });
+        gsap.to(".prompt-dot", { x: 220, duration: 1.15, ease: "power3.inOut", repeat: 1, yoyo: true });
+      }
+    }
+
+    setPrompt("scrolltrigger");
+
+    document.querySelectorAll("[data-focus]").forEach((button) => {
+      button.addEventListener("click", () => setPrompt(button.dataset.focus));
+    });
 
     if (!window.gsap) {
+      dependency.textContent = "GSAP 主库没有加载成功。页面依赖 CDN：如果离线打开，请先联网，或者把 GSAP 脚本下载成本地文件。";
       dependency.classList.add("is-visible");
     } else {
-      const plugins = [
-        window.ScrollTrigger,
-        window.ScrollToPlugin,
-        window.MotionPathPlugin,
-        window.Flip,
-        window.Draggable,
-        window.ScrambleTextPlugin
-      ].filter(Boolean);
+      const expectedPlugins = [
+        ["ScrollTrigger", window.ScrollTrigger],
+        ["ScrollToPlugin", window.ScrollToPlugin],
+        ["MotionPathPlugin", window.MotionPathPlugin],
+        ["Flip", window.Flip],
+        ["Draggable", window.Draggable],
+        ["InertiaPlugin", window.InertiaPlugin],
+        ["Observer", window.Observer],
+        ["ScrambleTextPlugin", window.ScrambleTextPlugin],
+        ["SplitText", window.SplitText],
+        ["MorphSVGPlugin", window.MorphSVGPlugin],
+        ["DrawSVGPlugin", window.DrawSVGPlugin]
+      ];
+      const loadedPlugins = expectedPlugins.filter(([, plugin]) => Boolean(plugin)).map(([, plugin]) => plugin);
+      const missing = expectedPlugins.filter(([, plugin]) => !plugin).map(([name]) => name);
 
-      if (plugins.length < 6) {
-        dependency.textContent = "部分 GSAP 插件没有加载成功。页面会明确暴露这个问题，不使用隐藏回退。请检查网络或 CDN。";
+      if (missing.length > 0) {
+        dependency.textContent = `以下 GSAP 插件没有加载成功：${missing.join(", ")}。相关 demo 会明确不可用，不做隐藏回退。请检查 CDN 网络或插件路径。`;
         dependency.classList.add("is-visible");
       }
 
-      gsap.registerPlugin(...plugins);
+      gsap.registerPlugin(...loadedPlugins);
 
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
       function runFade() {
-        gsap.fromTo(".demo-fade", { y: 54, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.8, ease: "power3.out" });
+        gsap.fromTo(".demo-fade", { y: 54, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.75, ease: "power3.out", overwrite: true });
       }
 
       function runElastic() {
-        gsap.fromTo(".demo-elastic", { scale: 0.18, rotation: -28, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.1, ease: "elastic.out(1, 0.45)" });
+        gsap.fromTo(".demo-elastic", { scale: 0.12, rotation: -26, autoAlpha: 0 }, { scale: 1, rotation: 0, autoAlpha: 1, duration: 1.1, ease: "elastic.out(1, 0.42)", overwrite: true });
       }
 
       function runStagger() {
-        gsap.fromTo(".demo-stagger span", { y: 70, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.08, ease: "back.out(1.8)" });
+        gsap.fromTo(".demo-stagger span", { y: 72, autoAlpha: 0, scaleY: 0.35 }, { y: 0, autoAlpha: 1, scaleY: 1, duration: 0.56, stagger: { each: 0.07, from: "edges" }, ease: "back.out(1.8)", overwrite: true });
+      }
+
+      function runTimeline() {
+        const tl = gsap.timeline({ defaults: { duration: 0.45, ease: "power3.out" } });
+        tl.set(".demo-timeline span", { autoAlpha: 1 })
+          .fromTo(".demo-timeline span", { scaleY: 0.2, y: 46 }, { scaleY: 1, y: 0, stagger: 0.08, ease: "back.out(1.8)" }, "intro")
+          .to(".demo-timeline span", { backgroundColor: "#255dff", stagger: 0.05 }, "intro+=0.22")
+          .to(".demo-timeline span", { rotation: (index) => [-8, 4, -4, 8][index], stagger: 0.04 }, "intro+=0.28");
       }
 
       function runCounter() {
         const state = { value: 0 };
         gsap.to(state, {
-          value: 128,
-          duration: 1.1,
+          value: 2026,
+          duration: 1.15,
           ease: "power2.out",
+          overwrite: true,
           onUpdate: () => {
-            document.getElementById("counter").textContent = Math.round(state.value);
+            document.getElementById("counter").textContent = Math.round(state.value).toLocaleString("zh-CN");
           }
         });
-      }
-
-      function runText() {
-        const chars = "文字逐行出现".split("");
-        const el = document.querySelector(".demo-text");
-        el.innerHTML = chars.map((char) => `<span style="display:inline-block">${char}</span>`).join("");
-        gsap.fromTo(".demo-text span", { y: 26, autoAlpha: 0, rotation: 6 }, { y: 0, autoAlpha: 1, rotation: 0, duration: 0.42, stagger: 0.045, ease: "power3.out" });
-      }
-
-      function runFloat() {
-        gsap.killTweensOf(".demo-float");
-        gsap.fromTo(".demo-float", { x: 0, y: 34, rotation: -4 }, { y: 12, rotation: 4, duration: 1.25, ease: "sine.inOut", repeat: -1, yoyo: true });
       }
 
       function runPath() {
         if (!window.MotionPathPlugin) return;
-        gsap.fromTo(".demo-path", { autoAlpha: 1 }, {
-          duration: 2.1,
+        gsap.killTweensOf(".demo-path");
+        gsap.set(".demo-path", { x: 0, y: 0, autoAlpha: 1 });
+        gsap.to(".demo-path", {
+          duration: 2.2,
           repeat: -1,
           ease: "none",
-          motionPath: {
-            path: "#motionPath",
-            align: "#motionPath",
-            alignOrigin: [0.5, 0.5]
-          }
+          motionPath: { path: "#motionPath", align: "#motionPath", alignOrigin: [0.5, 0.5], autoRotate: false }
         });
       }
 
-      function setupMouse() {
-        const stage = document.getElementById("mouseStage");
-        const dot = document.querySelector(".demo-mouse");
-        const xTo = gsap.quickTo(dot, "x", { duration: 0.35, ease: "power3.out" });
-        const yTo = gsap.quickTo(dot, "y", { duration: 0.35, ease: "power3.out" });
-        stage.addEventListener("pointermove", (event) => {
-          const rect = stage.getBoundingClientRect();
-          xTo(event.clientX - rect.left - 30);
-          yTo(event.clientY - rect.top - 64);
+      function runDraw() {
+        if (!window.DrawSVGPlugin) return;
+        gsap.fromTo("#drawPath", { drawSVG: "0% 0%" }, { drawSVG: "0% 100%", duration: 1.35, ease: "power2.inOut", overwrite: true });
+      }
+
+      function runMorph() {
+        if (!window.MorphSVGPlugin) return;
+        gsap.to("#morphShape", {
+          duration: 0.9,
+          morphSVG: "M120 18 C168 18 210 44 210 72 C210 104 168 124 120 124 C72 124 30 104 30 72 C30 44 72 18 120 18 Z",
+          yoyo: true,
+          repeat: 1,
+          ease: "power2.inOut",
+          overwrite: true
         });
+      }
+
+      function runSplit() {
+        const el = document.getElementById("splitText");
+        if (window.SplitText) {
+          if (el._split) el._split.revert();
+          el.textContent = "逐字出现";
+          el._split = SplitText.create(el, { type: "chars", aria: "auto" });
+          gsap.from(el._split.chars, { y: 30, autoAlpha: 0, rotation: 8, stagger: 0.045, duration: 0.45, ease: "power3.out", overwrite: true });
+          return;
+        }
+        el.innerHTML = "逐字出现".split("").map((char) => `<span style="display:inline-block">${char}</span>`).join("");
+        gsap.fromTo("#splitText span", { y: 30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, stagger: 0.045, duration: 0.45, ease: "power3.out", overwrite: true });
       }
 
       function runScramble() {
         if (!window.ScrambleTextPlugin) return;
         gsap.to("#scramble", {
           duration: 1.2,
-          scrambleText: {
-            text: "文字解码效果",
-            chars: "01X#GSAP",
-            speed: 0.35
-          },
-          ease: "none"
+          scrambleText: { text: "文字解码效果", chars: "01X#GSAP", speed: 0.35 },
+          ease: "none",
+          overwrite: true
         });
       }
 
@@ -1016,26 +1486,62 @@
         Draggable.create("#dragTarget", {
           type: "x,y",
           bounds: "#dragStage",
-          inertia: false
+          inertia: Boolean(window.InertiaPlugin),
+          edgeResistance: 0.75
+        });
+      }
+
+      function setupObserver() {
+        if (!window.Observer) return;
+        const pad = document.getElementById("observerPad");
+        const label = document.getElementById("observerText");
+        Observer.create({
+          target: pad,
+          type: "wheel,touch,pointer",
+          tolerance: 10,
+          onUp: () => updateObserver("向上 / 下一屏", -18),
+          onDown: () => updateObserver("向下 / 上一屏", 18),
+          onLeft: () => updateObserver("向左", -18),
+          onRight: () => updateObserver("向右", 18)
+        });
+
+        function updateObserver(text, rotation) {
+          label.textContent = text;
+          gsap.fromTo(pad, { rotation }, { rotation: 0, duration: 0.35, ease: "back.out(2)", overwrite: true });
+        }
+      }
+
+      function setupMouse() {
+        const stage = document.getElementById("mouseStage");
+        const dot = document.querySelector(".demo-mouse");
+        const xTo = gsap.quickTo(dot, "x", { duration: 0.32, ease: "power3.out" });
+        const yTo = gsap.quickTo(dot, "y", { duration: 0.32, ease: "power3.out" });
+        stage.addEventListener("pointermove", (event) => {
+          const rect = stage.getBoundingClientRect();
+          xTo(event.clientX - rect.left - 32);
+          yTo(event.clientY - rect.top - 70);
         });
       }
 
       const flipToggle = setupFlip();
-      setupMouse();
       setupDrag();
+      setupObserver();
+      setupMouse();
 
-      document.querySelectorAll(".replay").forEach((button) => {
+      document.querySelectorAll("[data-demo]").forEach((button) => {
         button.addEventListener("click", () => {
           const demo = button.dataset.demo;
           if (demo === "fade") runFade();
           if (demo === "elastic") runElastic();
           if (demo === "stagger") runStagger();
+          if (demo === "timeline") runTimeline();
           if (demo === "counter") runCounter();
-          if (demo === "text") runText();
-          if (demo === "float") runFloat();
           if (demo === "path") runPath();
-          if (demo === "flip") flipToggle();
+          if (demo === "draw") runDraw();
+          if (demo === "morph") runMorph();
+          if (demo === "split") runSplit();
           if (demo === "scramble") runScramble();
+          if (demo === "flip") flipToggle();
           if (demo === "scrollTop" && window.ScrollToPlugin) gsap.to(window, { duration: 0.9, scrollTo: "#hero", ease: "power2.inOut" });
         });
       });
@@ -1043,14 +1549,15 @@
       if (!reduceMotion) {
         const heroTimeline = gsap.timeline({ defaults: { ease: "power3.out" } });
         heroTimeline
-          .from(".kicker", { y: 22, autoAlpha: 0, duration: 0.5 })
-          .from(".hero-word", { yPercent: 110, autoAlpha: 0, duration: 0.72, stagger: 0.09 }, "-=0.15")
+          .from(".kicker", { y: 22, autoAlpha: 0, duration: 0.48 })
+          .from(".hero-word", { yPercent: 110, autoAlpha: 0, duration: 0.72, stagger: 0.08 }, "-=0.14")
           .from(".hero-text", { y: 20, autoAlpha: 0, duration: 0.55 }, "-=0.2")
-          .from(".hero-board", { x: 50, rotation: 2, autoAlpha: 0, duration: 0.75 }, "-=0.55")
-          .from(".slab, .orbital", { scale: 0.4, rotation: -12, autoAlpha: 0, duration: 0.68, stagger: 0.07 }, "-=0.35");
+          .from(".hero-actions", { y: 18, autoAlpha: 0, duration: 0.45 }, "-=0.18")
+          .from(".hero-lab", { x: 48, rotation: 2, autoAlpha: 0, duration: 0.7 }, "-=0.5")
+          .from(".hero-node, .hero-slab", { scale: 0.42, rotation: -14, autoAlpha: 0, duration: 0.65, stagger: 0.07 }, "-=0.34");
 
         window.setTimeout(() => {
-          gsap.set(".hero-word, .hero-text, .hero-board", {
+          gsap.set(".kicker, .hero-word, .hero-text, .hero-actions, .hero-lab", {
             autoAlpha: 1,
             x: 0,
             y: 0,
@@ -1058,36 +1565,29 @@
             rotation: 0,
             clearProps: "transform,opacity,visibility"
           });
-          gsap.set(".slab, .orbital", { autoAlpha: 1 });
-        }, 2600);
+          gsap.set(".hero-node, .hero-slab", { autoAlpha: 1 });
+        }, 3000);
 
-        gsap.to(".orbital", { x: 245, y: 230, rotation: 360, duration: 6, repeat: -1, yoyo: true, ease: "sine.inOut" });
-        gsap.to(".slab.one", { y: 20, duration: 2.4, repeat: -1, yoyo: true, ease: "sine.inOut" });
-        gsap.to(".slab.two", { x: 22, duration: 2.8, repeat: -1, yoyo: true, ease: "sine.inOut" });
-        gsap.to(".slab.three", { rotation: -10, duration: 2.2, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to(".hero-node", { x: 250, y: 230, rotation: 360, duration: 6, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to(".hero-slab.one", { y: 22, duration: 2.4, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to(".hero-slab.two", { x: 24, duration: 2.8, repeat: -1, yoyo: true, ease: "sine.inOut" });
+        gsap.to(".hero-slab.three", { rotation: -10, duration: 2.2, repeat: -1, yoyo: true, ease: "sine.inOut" });
 
         runFade();
         runElastic();
         runStagger();
+        runTimeline();
         runCounter();
-        runText();
-        runFloat();
         runPath();
+        runDraw();
+        runSplit();
         runScramble();
 
         if (window.ScrollTrigger) {
-          gsap.utils.toArray(".card").forEach((card) => {
-            gsap.from(card, {
-              y: 42,
-              autoAlpha: 0,
-              duration: 0.65,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: card,
-                start: "top 84%",
-                once: true
-              }
-            });
+          ScrollTrigger.batch(".ability, .demo-card, .guide-card", {
+            start: "top 86%",
+            once: true,
+            onEnter: (items) => gsap.from(items, { y: 36, autoAlpha: 0, duration: 0.62, stagger: 0.055, ease: "power3.out", overwrite: true })
           });
 
           ScrollTrigger.create({
@@ -1099,13 +1599,13 @@
           });
 
           gsap.utils.toArray(".step").forEach((step) => {
-            gsap.fromTo(step, { x: 55, autoAlpha: 0.25 }, {
+            gsap.fromTo(step, { x: 58, autoAlpha: 0.25 }, {
               x: 0,
               autoAlpha: 1,
               duration: 0.5,
               scrollTrigger: {
                 trigger: step,
-                start: "top 65%",
+                start: "top 66%",
                 end: "bottom 42%",
                 scrub: 0.8,
                 onEnter: () => document.getElementById("scrollState").textContent = step.dataset.state,
